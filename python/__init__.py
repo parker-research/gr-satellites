@@ -74,6 +74,7 @@ from .ks1q_header_remover import ks1q_header_remover
 from .lilacsat1_gps_kml import lilacsat1_gps_kml
 from .ngham_packet_crop import ngham_packet_crop
 from .ngham_remove_padding import ngham_remove_padding
+from .pdu_add_timestamp import pdu_add_timestamp
 from .pdu_to_kiss import pdu_to_kiss
 from .print_header import print_header
 from .print_timestamp import print_timestamp

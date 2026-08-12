@@ -113,10 +113,17 @@ class submit(gr.basic_block):
 
         self.request['frame'] = bytes(pmt.u8vector_elements(msg)).hex().upper()
 
-        t_now = datetime.datetime.now(tz=datetime.timezone.utc)
-        t_prop = (
-            t_now - self.startTimestamp + self.initialTimestamp
-            if self.initialTimestamp else t_now)
+        meta = pmt.car(msg_pmt)
+        timestamp_key = pmt.intern('timestamp')
+        if pmt.is_dict(meta) and pmt.dict_has_key(meta, timestamp_key):
+            t_prop = datetime.datetime.fromtimestamp(
+                pmt.to_double(pmt.dict_ref(meta, timestamp_key, pmt.PMT_NIL)),
+                tz=datetime.timezone.utc)
+        else:
+            t_now = datetime.datetime.now(tz=datetime.timezone.utc)
+            t_prop = (
+                t_now - self.startTimestamp + self.initialTimestamp
+                if self.initialTimestamp else t_now)
         t_prop_fmt = t_prop.replace(tzinfo=None).isoformat()[:-3] + 'Z'
         self.request['timestamp'] = t_prop_fmt
 

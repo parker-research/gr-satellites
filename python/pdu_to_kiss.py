@@ -45,16 +45,29 @@ class pdu_to_kiss(gr.basic_block):
         self.set_msg_handler(pmt.intern('in'), self.handle_msg)
         self.message_port_register_out(pmt.intern('out'))
 
-    def create_timestamp(self):
+    def create_timestamp(self, msg_pmt):
         """Returns the timestamp as a KISS control frame with control byte 09
 
         The timestamp is the number of milliseconds elapsed since the UNIX
         epoch according to UTC and not counting leap seconds, stored as a
         big-endian 64 bit unsigned integer
+
+        If the PDU carries a 'timestamp' metadata entry (added by
+        pdu_add_timestamp from a per-packet sample offset), that timestamp
+        is used. Otherwise, the timestamp is computed from the wall-clock
+        time elapsed since this block started, which requires the flowgraph
+        to be run at 1x speed (e.g. using --throttle) to be correct.
         """
-        t_now = datetime.datetime.now(tz=datetime.timezone.utc)
-        if self.initial_timestamp:
-            t_now = t_now - self.start_timestamp + self.initial_timestamp
+        meta = pmt.car(msg_pmt)
+        timestamp_key = pmt.intern('timestamp')
+        if pmt.is_dict(meta) and pmt.dict_has_key(meta, timestamp_key):
+            t_now = datetime.datetime.fromtimestamp(
+                pmt.to_double(pmt.dict_ref(meta, timestamp_key, pmt.PMT_NIL)),
+                tz=datetime.timezone.utc)
+        else:
+            t_now = datetime.datetime.now(tz=datetime.timezone.utc)
+            if self.initial_timestamp:
+                t_now = t_now - self.start_timestamp + self.initial_timestamp
         t_now_kiss = round(t_now.timestamp() * 1e3)
         control = b'\x09'
         return control + struct.pack('>Q', t_now_kiss)
@@ -71,7 +84,7 @@ class pdu_to_kiss(gr.basic_block):
 
         if self.include_timestamp:
             timestamp_frame = ([FEND]
-                               + kiss_escape(self.create_timestamp())
+                               + kiss_escape(self.create_timestamp(msg_pmt))
                                + [FEND])
             self.message_port_pub(
                 pmt.intern('out'),
