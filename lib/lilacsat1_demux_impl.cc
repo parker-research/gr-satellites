@@ -74,13 +74,11 @@ int lilacsat1_demux_impl::work(int noutput_items,
             d_position = -1;
 
             pmt::pmt_t meta = pmt::make_dict();
-            meta = pmt::dict_add(meta,
-                                 pmt::mp("sample_offset"),
-                                 pmt::from_uint64(nitems_read(0) + i));
+            meta = pmt::dict_add(
+                meta, pmt::mp("sample_offset"), pmt::from_uint64(nitems_read(0) + i));
             message_port_pub(
                 pmt::mp("frame"),
-                pmt::cons(meta,
-                          pmt::init_u8vector(d_frame.size(), d_frame.data())));
+                pmt::cons(meta, pmt::init_u8vector(d_frame.size(), d_frame.data())));
             d_frame.fill(0);
         }
 

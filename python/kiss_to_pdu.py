@@ -47,7 +47,8 @@ class kiss_to_pdu(gr.sync_block):
         tag_idx = 0
 
         for i, c in enumerate(input_items[0]):
-            while tag_idx < len(tags) and tags[tag_idx].offset <= nitems_start + i:
+            while (tag_idx < len(tags)
+                   and tags[tag_idx].offset <= nitems_start + i):
                 self.meta = pmt.dict_add(
                     self.meta, tags[tag_idx].key, tags[tag_idx].value)
                 tag_idx += 1

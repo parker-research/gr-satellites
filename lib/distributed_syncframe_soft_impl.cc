@@ -66,13 +66,11 @@ int distributed_syncframe_soft_impl::work(int noutput_items,
         if (match >= d_syncword.size() - d_threshold) {
             // sync found
             pmt::pmt_t meta = pmt::make_dict();
-            meta = pmt::dict_add(meta,
-                                 pmt::mp("sample_offset"),
-                                 pmt::from_uint64(nitems_read(0) + i));
+            meta = pmt::dict_add(
+                meta, pmt::mp("sample_offset"), pmt::from_uint64(nitems_read(0) + i));
             message_port_pub(
                 pmt::mp("out"),
-                pmt::cons(meta,
-                          pmt::init_f32vector(d_syncword.size() * d_step, in + i)));
+                pmt::cons(meta, pmt::init_f32vector(d_syncword.size() * d_step, in + i)));
         }
     }
 
