@@ -107,7 +107,7 @@ void decode_ra_code_impl::msg_handler(pmt::pmt_t pmt_msg)
     if ((float)errors / (ra_code_length * RA_BITCOUNT) < d_error_threshold) {
         message_port_pub(
             pmt::mp("out"),
-            pmt::cons(pmt::PMT_NIL, pmt::init_u8vector(d_size, d_ra_out.data())));
+            pmt::cons(pmt::car(pmt_msg), pmt::init_u8vector(d_size, d_ra_out.data())));
     }
 }
 

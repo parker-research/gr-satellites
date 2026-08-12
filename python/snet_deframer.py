@@ -165,7 +165,9 @@ class snet_deframer(gr.basic_block):
             return
 
         pdu = np.packbits(pdu_bytes)
-        pdu_tags = pmt.make_dict()
+        pdu_tags = pmt.car(msg_pmt)
+        if not pmt.is_dict(pdu_tags):
+            pdu_tags = pmt.make_dict()
         pdu_tags = pmt.dict_add(
             pdu_tags, pmt.intern('SNET SrcId'), pmt.from_long(hdr.SrcId))
         self.message_port_pub(

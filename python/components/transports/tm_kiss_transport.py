@@ -43,6 +43,7 @@ class tm_kiss_transport(gr.basic_block):
             TMPrimaryHeaderShort if short_tm else TMPrimaryHeader)
 
     def handle_msg(self, msg_pmt):
+        meta = pmt.car(msg_pmt)
         msg = pmt.cdr(msg_pmt)
         if not pmt.is_u8vector(msg):
             print('[ERROR] Received invalid message type. Expected u8vector')
@@ -62,7 +63,7 @@ class tm_kiss_transport(gr.basic_block):
                 if len(packet) > 0:
                     self.message_port_pub(
                         pmt.intern('out'),
-                        pmt.cons(pmt.PMT_NIL,
+                        pmt.cons(meta,
                                  pmt.init_u8vector(len(packet), packet)))
                     self.packets[vc] = []
             elif self.transpose[vc]:
