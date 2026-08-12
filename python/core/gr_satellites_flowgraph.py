@@ -26,6 +26,7 @@ from ..components import demodulators
 from ..components import transports
 from ..satyaml import yamlfiles
 from .. import pdu_add_meta
+from .. import pdu_add_timestamp
 
 
 def set_options(cl, *args, **kwargs):
@@ -159,6 +160,7 @@ class gr_satellites_flowgraph(gr.hier_block2):
             self._demodulators = dict()
             self._deframers = dict()
             self._taggers = dict()
+            self._timestampers = dict()
             for key, transmitter in satyaml['transmitters'].items():
                 self._init_demodulator_deframer(key, transmitter)
 
@@ -304,6 +306,19 @@ class gr_satellites_flowgraph(gr.hier_block2):
         tagger = pdu_add_meta(meta)
         self._taggers[key] = tagger
         self.msg_connect((deframer, 'out'), (tagger, 'in'))
+
+        # Turn the 'sample_offset' metadata some deframers attach to their
+        # PDUs (the offset, in symbols, of the frame within the deframer's
+        # input stream) into an absolute 'timestamp' metadata entry, using
+        # the transmitter's baudrate and the recording start time. This
+        # allows datasinks to compute correct per-packet timestamps without
+        # needing the flowgraph to be throttled to 1x playback speed.
+        start_time = getattr(self.options, 'start_time', '') \
+            if self.options is not None else ''
+        timestamper = pdu_add_timestamp(transmitter['baudrate'], start_time)
+        self._timestampers[key] = timestamper
+        self.msg_connect((tagger, 'out'), (timestamper, 'in'))
+        tagger = timestamper
 
         if self.grc_block:
             # If we are a GRC block we have no datasinks

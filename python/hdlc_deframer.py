@@ -61,8 +61,9 @@ class hdlc_deframer(gr.sync_block):
 
     def work(self, input_items, output_items):
         in0 = input_items[0]
+        nitems = self.nitems_read(0)
 
-        for x in in0:
+        for i, x in enumerate(in0):
             if x:
                 self.ones += 1
                 self.bits.append(x)
@@ -84,9 +85,15 @@ class hdlc_deframer(gr.sync_block):
                     if frame and (not self.check or self.fcs_ok(frame)):
                         # Send frame
                         buff = frame[:-2]  # trim fcs
+                        # sample_offset is the offset of the closing flag,
+                        # used to derive a per-packet timestamp when
+                        # replaying a recording (see pdu_add_timestamp)
+                        meta = pmt.dict_add(
+                            pmt.make_dict(), pmt.intern('sample_offset'),
+                            pmt.from_uint64(nitems + i))
                         self.message_port_pub(
                             pmt.intern('out'),
-                            pmt.cons(pmt.PMT_NIL,
+                            pmt.cons(meta,
                                      pmt.init_u8vector(len(buff), buff)))
                 else:
                     self.bits.append(x)

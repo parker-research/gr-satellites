@@ -88,7 +88,7 @@ void matrix_deinterleaver_soft_impl::msg_handler(pmt::pmt_t pmt_msg)
     // Output cropping
     message_port_pub(
         pmt::mp("out"),
-        pmt::cons(pmt::PMT_NIL,
+        pmt::cons(pmt::car(pmt_msg),
                   pmt::init_f32vector(d_output_size, &d_out[d_output_skip])));
 }
 

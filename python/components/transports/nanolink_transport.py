@@ -83,7 +83,7 @@ class nanolink_defragmenter(gr.basic_block):
                 self.remain = None
                 self.message_port_pub(
                     pmt.intern('out'),
-                    pmt.cons(pmt.PMT_NIL,
+                    pmt.cons(meta,
                              pmt.init_u8vector(len(self.current),
                                                list(self.current))))
 

@@ -79,7 +79,7 @@ class k2sat_deframer(gr.basic_block):
                 ax25_packet = list(packet)  # conversion to list for pybind11
                 self.message_port_pub(
                     pmt.intern('out'),
-                    pmt.cons(pmt.PMT_NIL,
+                    pmt.cons(pmt.car(msg_pmt),
                              pmt.init_u8vector(len(ax25_packet), ax25_packet)))
             start = idx + 2
 

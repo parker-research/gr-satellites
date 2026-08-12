@@ -141,9 +141,12 @@ int fixedlen_to_pdu_impl::work(int noutput_items,
                 }
                 pack_packet(pdu_items);
             }
+            pmt::pmt_t meta = pmt::make_dict();
+            meta = pmt::dict_add(
+                meta, pmt::mp("sample_offset"), pmt::from_uint64(info.offset));
             message_port_pub(
                 msgport_names::pdus(),
-                pmt::cons(pmt::PMT_NIL,
+                pmt::cons(meta,
                           pdu::make_pdu_vector(d_type, d_packet.data(), pdu_items)));
         } else {
             // End of packet not yet available. Save for next run

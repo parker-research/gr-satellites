@@ -90,7 +90,7 @@ void ax100_decode_impl::msg_handler(pmt::pmt_t pmt_msg)
         // Send by GNUradio message
         message_port_pub(
             pmt::mp("out"),
-            pmt::cons(pmt::PMT_NIL, pmt::init_u8vector(frame_len, &d_data[1])));
+            pmt::cons(pmt::car(pmt_msg), pmt::init_u8vector(frame_len, &d_data[1])));
     } else if (d_verbose) {
         std::printf("RS decode failed.\n");
     }

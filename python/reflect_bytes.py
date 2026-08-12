@@ -39,4 +39,4 @@ class reflect_bytes(gr.basic_block):
 
         self.message_port_pub(
             pmt.intern('out'),
-            pmt.cons(pmt.PMT_NIL, pmt.init_u8vector(len(packet), packet)))
+            pmt.cons(pmt.car(msg_pmt), pmt.init_u8vector(len(packet), packet)))

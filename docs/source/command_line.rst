@@ -747,15 +747,25 @@ Getting correct timestamps with recordings
 One of the difficulties with working with recordings is obtaining correct
 timestamps for each of the decoded packets. These timestamps are included in
 KISS files and telemetry submissions to some servers, such as SatNOGS DB. To
-produced correct timestamps ``gr_satellites`` will play back the recording at 1x
-speed and count the clock time elapsed since the beginning of the execution, it
-will then add that time to a timestamp specified by the user, which should
-correspond to the start of the recording.
+produce correct timestamps, always use the ``--start_time`` parameter followed
+by the timestamp in ISO 8601 format (``YYYY-MM-DDTHH:MM:SS``) to indicate the
+start time of the recording.
 
-To use this functionality it is necessary to use the ``--throttle`` parameter to
-limit playback speed to 1x and use the ``--start_time`` parameter followed by the
-timestamp in ISO 8601 format (``YYYY-MM-DDTHH:MM:SS``) to indicate the start time
-of the recording.
+Many deframers (those based on ``sync_to_pdu``, such as most fixed-length
+framings, and the AX.25 deframer) attach the offset of each frame within the
+recording to the decoded packet. When this information is available,
+``gr_satellites`` computes each packet's timestamp directly from that offset
+and the transmitter's baudrate, so the recording can be decoded as fast as
+possible while still producing correct timestamps; ``--throttle`` is not
+needed in this case.
+
+For deframers that do not yet attach this information, ``gr_satellites``
+falls back to playing back the recording at 1x speed and counting the clock
+time elapsed since the beginning of the execution, adding that elapsed time
+to the timestamp given by ``--start_time``. To use this fallback it is
+necessary to use the ``--throttle`` parameter to limit playback speed to 1x
+(this is harmless to leave enabled even when the faster, offset-based
+timestamping applies).
 
 Treating unknown args as warning
 """"""""""""""""""""""""""""""""

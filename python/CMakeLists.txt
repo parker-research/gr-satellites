@@ -71,6 +71,7 @@ GR_PYTHON_INSTALL(
     lilacsat1_gps_kml.py
     ngham_packet_crop.py
     ngham_remove_padding.py
+    pdu_add_timestamp.py
     pdu_to_kiss.py
     print_header.py
     print_timestamp.py

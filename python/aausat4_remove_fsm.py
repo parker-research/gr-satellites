@@ -38,9 +38,9 @@ class aausat4_remove_fsm(gr.basic_block):
         packet_long = pmt.f32vector_elements(msg)[8:8+1996]
         self.message_port_pub(
             pmt.intern('short'),
-            pmt.cons(pmt.PMT_NIL,
+            pmt.cons(pmt.car(msg_pmt),
                      pmt.init_f32vector(len(packet_short), packet_short)))
         self.message_port_pub(
             pmt.intern('long'),
-            pmt.cons(pmt.PMT_NIL,
+            pmt.cons(pmt.car(msg_pmt),
                      pmt.init_f32vector(len(packet_long), packet_long)))

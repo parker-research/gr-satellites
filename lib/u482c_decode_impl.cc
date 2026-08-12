@@ -170,7 +170,7 @@ void u482c_decode_impl::msg_handler(pmt::pmt_t pmt_msg)
 
     // Send via GNU Radio message
     message_port_pub(pmt::mp("out"),
-                     pmt::cons(pmt::PMT_NIL, pmt::init_u8vector(rx_len, packet)));
+                     pmt::cons(pmt::car(pmt_msg), pmt::init_u8vector(rx_len, packet)));
 }
 } /* namespace satellites */
 } /* namespace gr */

@@ -29,18 +29,36 @@ class kiss_to_pdu(gr.sync_block):
         self.pdu = list()
         self.transpose = False
         self.control_byte = control_byte
+        # Metadata (e.g. 'timestamp') carried by pdu_to_tagged_stream as
+        # stream tags on the PDU this byte stream was built from. Updated
+        # as tags are encountered, so it reflects the most recent PDU seen
+        # so far; used as a best-effort metadata source for the PDUs
+        # reconstructed here, since a single upstream PDU may contain
+        # several KISS-encapsulated frames (or a frame may span more than
+        # one upstream PDU).
+        self.meta = pmt.make_dict()
 
         self.message_port_register_out(pmt.intern('out'))
 
     def work(self, input_items, output_items):
-        for c in input_items[0]:
+        nitems_start = self.nitems_read(0)
+        n = len(input_items[0])
+        tags = sorted(self.get_tags_in_window(0, 0, n), key=lambda t: t.offset)
+        tag_idx = 0
+
+        for i, c in enumerate(input_items[0]):
+            while (tag_idx < len(tags)
+                   and tags[tag_idx].offset <= nitems_start + i):
+                self.meta = pmt.dict_add(
+                    self.meta, tags[tag_idx].key, tags[tag_idx].value)
+                tag_idx += 1
             if c == FEND:
                 if (self.pdu
                         and (not self.control_byte or not self.pdu[0] & 0x0f)):
                     msg = self.pdu[1:] if self.control_byte else self.pdu
                     self.message_port_pub(
                         pmt.intern('out'),
-                        pmt.cons(pmt.PMT_NIL,
+                        pmt.cons(self.meta,
                                  pmt.init_u8vector(len(msg), msg)))
                 self.pdu = list()
             elif self.transpose:
