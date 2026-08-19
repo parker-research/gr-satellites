@@ -10,8 +10,8 @@ transmitters:
     baudrate: 9600
     deviation: 3200
     framing: AX100 ASM+Golay
-    scrambler: CCSDS
-    syncword: 4
     data:
     - *tlm
+
+# AX100 Configuration: https://github.com/CalgaryToSpace/CTS-SAT-1-Ground-Station/blob/main/docs/AX100_Config_Dump.txt
 
