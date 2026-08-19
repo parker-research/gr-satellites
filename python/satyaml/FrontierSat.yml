@@ -2,7 +2,7 @@ name: FRONTIERSAT
 norad: 69015
 data:
   &tlm Telemetry:
-    telemetry: hexdump
+    unknown
 transmitters:
   9k6 FSK downlink:
     frequency: 436.150e+6
